@@ -1,0 +1,6 @@
+vec_add is basically the Hello World program of CUDA C programming.
+All we do is add two vectors of n floats and put the results in to
+an output vector.
+
+I start with an initial iterative version and slowly transform it
+into CUDA C. See the vec_add_* branches to see that.
