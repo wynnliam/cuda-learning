@@ -1,11 +1,20 @@
 // Liam Wynn, 3/23/2021, CUDA Learning
 
 /*
- * Demo taken from Kirk & Hwu's Programming Massively Parallel Processors, Third Edition
+ * Demo taken from Kirk & Hwu's Programming Massively Parallel Processors, Third Edition.
+ *
+ * To compile do:
+ * nvcc vec_add.c
+ *
+ * You may get an error about a lack of Microsoft Visual Studio or whatever. In that case
+ * do:
+ *
+ * nvcc -allow-unsupported-compiler vec_add.c
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cuda.h>
 
 // Add the elements of h_A, h_B and put the result in h_C
 void vecAdd(float *h_A, float *h_B, float *h_C, const int n);
