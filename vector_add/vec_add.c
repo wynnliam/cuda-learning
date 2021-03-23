@@ -44,9 +44,19 @@ int main() {
 }
 
 void vecAdd(float *h_A, float *h_B, float *h_C, const int n) {
+  float *d_A, *d_B, *d_C;
+
+  cudaMalloc((void**)&d_A, sizeof(float) * n);
+  cudaMalloc((void**)&d_B, sizeof(float) * n);
+  cudaMalloc((void**)&d_C, sizeof(float) * n);
+
   int i;
   for(i = 0; i < n; i++)
     h_C[i] = h_A[i] + h_B[i];
+
+  cudaFree(d_A);
+  cudaFree(d_B);
+  cudaFree(d_C);
 }
 
 void vecPrint(float *v, const int n) {
