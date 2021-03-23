@@ -46,10 +46,26 @@ int main() {
 void vecAdd(float *h_A, float *h_B, float *h_C, const int n) {
   float *d_A, *d_B, *d_C;
   const int size = sizeof(float) * n;
+  cudaError_t err;
 
-  cudaMalloc((void**)&d_A, size);
-  cudaMalloc((void**)&d_B, size);
-  cudaMalloc((void**)&d_C, size);
+  err = cudaMalloc((void**)&d_A, size);
+  if(err != cudaSuccess) {
+    printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
+    exit(EXIT_FAILURE);
+  } else {
+    err = cudaMalloc((void**)&d_B, size);
+    
+    if(err != cudaSuccess) {
+      printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
+      exit(EXIT_FAILURE);
+    } else {
+      err = cudaMalloc((void**)&d_C, size);
+      if(err != cudaSuccess) {
+        printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
 
   // Must copy the data from the host to the device
   cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
