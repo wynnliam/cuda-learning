@@ -45,14 +45,21 @@ int main() {
 
 void vecAdd(float *h_A, float *h_B, float *h_C, const int n) {
   float *d_A, *d_B, *d_C;
+  const int size = sizeof(float) * n;
 
-  cudaMalloc((void**)&d_A, sizeof(float) * n);
-  cudaMalloc((void**)&d_B, sizeof(float) * n);
-  cudaMalloc((void**)&d_C, sizeof(float) * n);
+  cudaMalloc((void**)&d_A, size);
+  cudaMalloc((void**)&d_B, size);
+  cudaMalloc((void**)&d_C, size);
+
+  // Must copy the data from the host to the device
+  cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
+  cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
 
   int i;
   for(i = 0; i < n; i++)
     h_C[i] = h_A[i] + h_B[i];
+
+  cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
   cudaFree(d_A);
   cudaFree(d_B);
