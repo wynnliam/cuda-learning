@@ -4,12 +4,12 @@
  * Demo taken from Kirk & Hwu's Programming Massively Parallel Processors, Third Edition.
  *
  * To compile do:
- * nvcc vec_add.c
+ * nvcc vec_add.cu
  *
  * You may get an error about a lack of Microsoft Visual Studio or whatever. In that case
  * do:
  *
- * nvcc -allow-unsupported-compiler vec_add.c
+ * nvcc -allow-unsupported-compiler vec_add.cu
  */
 
 #include <stdio.h>
