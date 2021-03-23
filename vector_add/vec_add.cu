@@ -23,7 +23,7 @@ void vecAdd(float *h_A, float *h_B, float *h_C, const int n);
 void vecPrint(float *v, const int n);
 
 int main() {
-	const int N = 10;
+	const int N = 1000000;
 	float *h_A, *h_B, *h_C;
 
 	h_A = (float*)malloc(N * sizeof(float));
@@ -38,9 +38,15 @@ int main() {
 
 	vecAdd(h_A, h_B, h_C, N);
 
-	printf("h_A: "); vecPrint(h_A, N);
-	printf("h_B: "); vecPrint(h_B, N);
-	printf("h_C: "); vecPrint(h_C, N);
+	printf("h_A: "); vecPrint(h_A, 10);
+	printf("h_B: "); vecPrint(h_B, 10);
+	printf("h_C: "); vecPrint(h_C, 10);
+}
+
+__global__
+void vecAddKernel(float *A, float *B, float *C, const int n) {
+  int i = blockDim.x * blockIdx.x + threadIdx.x;
+  if(i < n) C[i] = A[i] + B[i];
 }
 
 void vecAdd(float *h_A, float *h_B, float *h_C, const int n) {
@@ -52,28 +58,26 @@ void vecAdd(float *h_A, float *h_B, float *h_C, const int n) {
   if(err != cudaSuccess) {
     printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
     exit(EXIT_FAILURE);
-  } else {
-    err = cudaMalloc((void**)&d_B, size);
-    
-    if(err != cudaSuccess) {
-      printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
-      exit(EXIT_FAILURE);
-    } else {
-      err = cudaMalloc((void**)&d_C, size);
-      if(err != cudaSuccess) {
-        printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
-        exit(EXIT_FAILURE);
-      }
-    }
-  }
+  } 
+
+  err = cudaMalloc((void**)&d_B, size);
+	if(err != cudaSuccess) {
+		printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
+		exit(EXIT_FAILURE);
+	}
+
+	err = cudaMalloc((void**)&d_C, size);
+	if(err != cudaSuccess) {
+		printf("%s in %s at line %d\n", cudaGetErrorString(err), __FILE__, __LINE__);
+		exit(EXIT_FAILURE);
+	}
 
   // Must copy the data from the host to the device
   cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
   cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
 
-  int i;
-  for(i = 0; i < n; i++)
-    h_C[i] = h_A[i] + h_B[i];
+  // Invoke the kernel. We want ceil(n / 256) blocks, each with 256 threads in them.
+  vecAddKernel<<<(int)ceil(n/256.0), 256>>>(d_A, d_B, d_C, n);
 
   cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 
