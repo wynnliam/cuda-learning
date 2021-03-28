@@ -9,10 +9,9 @@ typedef unsigned int img_dim;
 
 __global__
 void greyscaleKernel(unsigned char *pin, unsigned char *pout, const img_dim width, const img_dim height) {
-  int row, col;
-
-  row = blockIdx.y * blockDim.y + threadIdx.y;
+  unsigned int row, col;
   col = blockIdx.x * blockDim.x + threadIdx.x;
+  row = blockIdx.y * blockDim.y + threadIdx.y;
 
   // Index into both arrays.
   unsigned int pixelIndex;
@@ -24,7 +23,7 @@ void greyscaleKernel(unsigned char *pin, unsigned char *pout, const img_dim widt
     r = pin[pixelIndex];
     g = pin[pixelIndex + 1];
     b = pin[pixelIndex + 2];
-    grey = (unsigned char)(0.21f * r + 0.71f * g + 0.007f * b);
+    grey = (unsigned char)(0.21f * r + 0.71f * g + 0.07f * b);
     pout[pixelIndex] = grey;
     pout[pixelIndex + 1] = grey;
     pout[pixelIndex + 2] = grey;
